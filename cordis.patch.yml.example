@@ -1,0 +1,33 @@
+# ============================================================================
+# dsh-cua-pill —— DSH bundle patch (template)
+# ============================================================================
+# Copy this file to `cordis.patch.yml` and replace every <PLACEHOLDER>.
+#
+#   cp cordis.patch.yml.example cordis.patch.yml
+#
+# `<PATH_TO_DSH_EXE>`     absolute path of the harness executable that ships a
+#                         Node runtime (it is launched with
+#                         ELECTRON_RUN_AS_NODE=1, so it runs proxy.mjs as Node).
+# `<PLUGIN_DIR>`          absolute path of this cloned repository.
+# `<CUA_SERVER_EXE>`      absolute path of YOUR OWN Computer Use server binary.
+#                         It is NOT included in this repository — see README.
+#
+# The whole block is removed when the plugin is disabled: no control tools,
+# no overlay, nothing left behind.
+# ============================================================================
+
+- insert:
+    - id: mcp-cua
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: cua
+        transport: stdio
+        command: '<PATH_TO_DSH_EXE>'
+        args:
+          - '<PLUGIN_DIR>/proxy.mjs'
+        env:
+          ELECTRON_RUN_AS_NODE: '1'
+          # Text shown on the pill. Change it to anything you like.
+          CUA_LABEL: 'AI 正在操控电脑'
+          CUA_SERVER: '<CUA_SERVER_EXE>'
+        toolCallTimeoutMs: 180000

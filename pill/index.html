@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>pill</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+
+  /* Light frosted glass: translucent white body that picks up whatever sits behind it. */
+  #pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    max-width: 560px;
+    padding: 0 16px 0 13px;
+    border-radius: 17px;
+    background:
+      linear-gradient(158deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.42) 46%, rgba(255, 255, 255, 0.64) 100%),
+      rgba(236, 242, 248, 0.34);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow:
+      0 10px 26px rgba(15, 23, 42, 0.20),
+      0 2px 5px rgba(15, 23, 42, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.40);
+    color: rgba(18, 24, 32, 0.94);
+    opacity: 0;
+    transform: translateY(-7px) scale(0.97);
+    transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.2, 0.9, 0.25, 1);
+    will-change: opacity, transform;
+  }
+
+  /* Glass sheen across the upper half of the capsule. */
+  #pill::before {
+    content: '';
+    position: absolute;
+    inset: 1px 1px auto 1px;
+    height: 48%;
+    border-radius: 16px 16px 40px 40px / 16px 16px 22px 22px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
+
+  #pill.in { opacity: 1; transform: translateY(0) scale(1); }
+  #pill.out { opacity: 0; transform: translateY(-5px) scale(0.98); transition-duration: 0.13s; }
+
+  /* Signal: breathing dot with an expanding halo (no spinner). */
+  .signal {
+    position: relative;
+    flex: none;
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .signal .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #1f6feb;
+    box-shadow: 0 0 8px rgba(31, 111, 235, 0.65);
+    animation: breathe 1.7s ease-in-out infinite;
+  }
+
+  .signal .halo {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.4px solid rgba(31, 111, 235, 0.55);
+    animation: halo 1.7s ease-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(0.80); opacity: 0.72; }
+    50% { transform: scale(1.14); opacity: 1; }
+  }
+
+  @keyframes halo {
+    0% { transform: scale(0.42); opacity: 0.85; }
+    70% { transform: scale(1.05); opacity: 0; }
+    100% { transform: scale(1.05); opacity: 0; }
+  }
+
+  .label {
+    position: relative;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.15px;
+    white-space: nowrap;
+    color: rgba(16, 23, 32, 0.94);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.70);
+  }
+
+  .sep {
+    position: relative;
+    flex: none;
+    width: 1px;
+    height: 11px;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.26), rgba(15, 23, 42, 0));
+  }
+
+  .detail {
+    position: relative;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    color: rgba(30, 41, 55, 0.70);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.60);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .signal .dot { animation-duration: 3.4s; }
+    .signal .halo { animation-duration: 3.4s; }
+  }
+</style>
+</head>
+<body>
+  <div id="pill">
+    <span class="signal"><span class="halo"></span><span class="dot"></span></span>
+    <span class="label" id="label">AI 正在操控电脑</span>
+    <span class="sep" id="sep" hidden></span>
+    <span class="detail" id="detail"></span>
+  </div>
+
+<script>
+  const pill = document.getElementById('pill');
+  const labelEl = document.getElementById('label');
+  const detailEl = document.getElementById('detail');
+  const sepEl = document.getElementById('sep');
+  let shown = false;
+  let exitTimer = null;
+
+  const setDetail = text => {
+    const value = (text || '').trim();
+    detailEl.textContent = value;
+    sepEl.hidden = value.length === 0;
+    detailEl.hidden = value.length === 0;
+  };
+
+  window.pillApi.on(message => {
+    switch (message.type) {
+      case 'label':
+        labelEl.textContent = message.label || labelEl.textContent;
+        break;
+      case 'show':
+        clearTimeout(exitTimer);
+        if (message.label) labelEl.textContent = message.label;
+        setDetail(message.detail);
+        pill.classList.remove('out');
+        pill.classList.add('in');
+        shown = true;
+        break;
+      case 'update':
+        setDetail(message.detail);
+        break;
+      case 'hide':
+        if (!shown) break;
+        shown = false;
+        pill.classList.remove('in');
+        pill.classList.add('out');
+        exitTimer = setTimeout(() => window.pillApi.hidden(), 170);
+        break;
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+# Dependencies — package-lock.json IS committed (pins the Electron runtime)
+node_modules/
+pnpm-lock.yaml
+yarn.lock
+
+# Bundled backend binaries — never commit third-party executables.
+# The Computer Use server must be supplied by the user at runtime.
+bin/*
+!bin/.gitkeep
+!bin/README.md
+
+# Local backup / scratch copies
+_legacy_*/
+*.bak
+*.orig
+
+# Installed plugin wiring, filled in with machine-local absolute paths
+cordis.patch.yml
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log
+npm-debug.log*

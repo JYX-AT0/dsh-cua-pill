@@ -1,0 +1,36 @@
+{
+  "name": "dsh-cua-pill",
+  "version": "0.1.1",
+  "description": "Screen-top glass pill that shows what an MCP Computer-Use agent is doing right now, driven by tools/call traffic on a stdio JSON-RPC proxy.",
+  "type": "module",
+  "main": "proxy.mjs",
+  "author": "AT0",
+  "files": [
+    "proxy.mjs",
+    "pill",
+    "bin",
+    "cordis.patch.yml",
+    "cordis.patch.yml.example"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "mcp",
+    "computer-use",
+    "cua",
+    "electron",
+    "overlay"
+  ],
+  "dependencies": {
+    "electron": "^44.7.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

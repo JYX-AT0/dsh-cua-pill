@@ -1,0 +1,13 @@
+# Normalize line endings: LF in the repo, native on checkout.
+* text=auto eol=lf
+
+# Never mangle binaries or let git diff them as text.
+*.exe binary
+*.dll binary
+*.node binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
